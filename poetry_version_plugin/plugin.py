@@ -96,6 +96,15 @@ class VersionPlugin(Plugin):  # type: ignore
             )
             if result.returncode == 0:
                 tag = result.stdout.strip()
+                if not exact_match: 
+                    # git describe is not pep440 compliant
+                    # try to generate a pep440 friendly version
+                    # based on git describe
+                    try:
+                        tag = tag.split("-")[0] + ".dev" + tag.split("-")[1]
+                    except IndexError:
+                        # no "-": pass the tag unchanged
+                        pass
                 io.write_line(
                     "<b>poetry-version-plugin</b>: Git tag found, setting "
                     f"dynamic version to: {tag}"
