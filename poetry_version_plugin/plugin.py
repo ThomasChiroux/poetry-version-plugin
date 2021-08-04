@@ -83,8 +83,13 @@ class VersionPlugin(Plugin):  # type: ignore
             io.write_error_line(message)
             raise RuntimeError(message)
         elif version_source == "git-tag":
+            exact_match = poetry_version_config.get("exact-match", True)
+            if exact_match:
+                git_cmd = ["git", "describe", "--exact-match", "--tags", "HEAD"]
+            else:
+                git_cmd = ["git", "describe",  "--tags", "HEAD"]
             result = subprocess.run(
-                ["git", "describe", "--exact-match", "--tags", "HEAD"],
+                git_cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
